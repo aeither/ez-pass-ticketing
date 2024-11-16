@@ -66,11 +66,13 @@ export default function LandingPage() {
 							description="Interact 2."
 						/>
 					</Link>
-					<FeatureCard
-						icon={<Globe className="h-8 w-8 text-purple-600" />}
-						title="World ID Verification"
-						description="Buy tickets securely with World ID verification, ensuring authenticity and preventing fraud."
-					/>
+					<Link href="/world/verify">
+						<FeatureCard
+							icon={<Globe className="h-8 w-8 text-purple-600" />}
+							title="World ID Verification"
+							description="Buy tickets securely with World ID verification, ensuring authenticity and preventing fraud."
+						/>
+					</Link>
 					<Link href="/world/pay">
 						<FeatureCard
 							icon={<Send className="h-8 w-8 text-purple-600" />}
