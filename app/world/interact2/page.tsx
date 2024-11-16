@@ -5,7 +5,6 @@ import { abi as ticketingSystemABI } from "@/lib/abi";
 import { TICKETING_SYSTEM_ADDRESS } from "@/lib/constants";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
-import { parseEther } from "viem";
 
 export default function CounterPage() {
 	const [newNumber, setNewNumber] = useState<number>(0);
@@ -37,24 +36,8 @@ export default function CounterPage() {
 						{
 							address: TICKETING_SYSTEM_ADDRESS,
 							abi: ticketingSystemABI,
-							functionName: "createCampaign",
-							args: [
-								"Test Event", // name
-								"Description", // description
-								parseEther("0.000001"), // pricePerTicket
-								5, // platformFeePercentage
-								2, // transferFeePercentage
-								Math.floor(Date.now() / 1000), // startDate
-								Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // expirationDate
-								"image.jpg", // imageUrl
-								"New York", // city
-								"USA", // country
-								100, // ticketsAvailable
-								"store123", // storeId
-								"secret123", // secretName
-								"Music", // category
-								"Concert", // eventType
-							],
+							functionName: "createTestCampaign",
+							args: ["test", BigInt(3), 123],
 						},
 					],
 				});
