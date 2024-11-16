@@ -7,6 +7,8 @@ import {
 	useWriteContract,
 } from "wagmi";
 import { abi as ticketingSystemABI } from "./abi";
+import { abi as simpleTicketingSystemABI } from "./abiSimpleTicketing";
+import { SIMPLE_TICKETING_SYSTEM_ADDRESS } from "./constants";
 import { readClient } from "./readClient";
 
 const TICKETING_SYSTEM_ADDRESS = "0x19a081e99566b32Bb6a306D3B144adE71b13aB78";
@@ -124,6 +126,16 @@ export function useTicketingSystem() {
 				// category,
 				// eventType,
 			],
+		});
+	};
+
+	// Create Campaign
+	const createSimpleCampaign = async () => {
+		return writeContractAsync({
+			address: SIMPLE_TICKETING_SYSTEM_ADDRESS,
+			abi: simpleTicketingSystemABI,
+			functionName: "createCampaign",
+			args: ["hello", BigInt(1), BigInt(1), BigInt(1)],
 		});
 	};
 

@@ -1,8 +1,8 @@
 // app/counter/page.tsx
 "use client";
 
-import { abi as ticketingSystemABI } from "@/lib/abi";
-import { TICKETING_SYSTEM_ADDRESS } from "@/lib/constants";
+import { abi as simpleTicketingSystemABI } from "@/lib/abiSimpleTicketing";
+import { SIMPLE_TICKETING_SYSTEM_ADDRESS } from "@/lib/constants";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
 
@@ -34,10 +34,10 @@ export default function CounterPage() {
 				await MiniKit.commandsAsync.sendTransaction({
 					transaction: [
 						{
-							address: TICKETING_SYSTEM_ADDRESS,
-							abi: ticketingSystemABI,
-							functionName: "createTestCampaign",
-							args: ["test", BigInt(3), 123],
+							address: SIMPLE_TICKETING_SYSTEM_ADDRESS,
+							abi: simpleTicketingSystemABI,
+							functionName: "createCampaign",
+							args: ["hello", BigInt(1), BigInt(1), BigInt(1)],
 						},
 					],
 				});
