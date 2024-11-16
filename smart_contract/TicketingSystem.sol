@@ -177,6 +177,50 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
         return campaignCount;
     }
 
+    function createTestCampaign(
+        string calldata name,
+        uint96 price,
+        uint32 tickets
+    ) external whenNotPaused returns (uint256) {
+        unchecked {
+            campaignCount++;
+        }
+
+        campaigns[campaignCount] = Campaign({
+            name: name,
+            description: "Test Description",
+            pricePerTicket: price,
+            platformFeePercentage: 5,
+            transferFeePercentage: 2,
+            startDate: uint40(block.timestamp),
+            expirationDate: uint40(block.timestamp + 30 days),
+            imageUrl: "test-image.jpg",
+            city: "Test City",
+            country: "Test Country",
+            owner: msg.sender,
+            ticketsAvailable: tickets,
+            ticketsSold: 0,
+            exists: true,
+            storeId: "test-store-123",
+            secretName: "test-secret-123",
+            category: "Test Category",
+            eventType: "Test Event",
+            campaignId: campaignCount
+        });
+
+        emit CampaignCreated(
+            campaignCount,
+            name,
+            price,
+            uint40(block.timestamp),
+            uint40(block.timestamp + 30 days),
+            msg.sender,
+            "Test Category"
+        );
+
+        return campaignCount;
+    }
+
     function setTicketSecret(
         uint256 campaignId,
         uint32 ticketIndex,
