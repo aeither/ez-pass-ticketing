@@ -42,6 +42,7 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
         string secretName;
         string category;
         string eventType;
+        uint256 campaignId;
     }
 
     struct Ticket {
@@ -51,6 +52,9 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
         uint32 ticketIndex;
         string secret;
         string imageUrl;
+        string nillionUserId;
+        string nillionStoreId;
+        string nillionPidToSid;
     }
 
     struct TransferListing {
@@ -67,7 +71,7 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
 
     mapping(uint256 => Campaign) public campaigns;
     mapping(uint256 => Ticket) public tickets;
-     mapping(uint256 => TransferListing) public transfers;
+    mapping(uint256 => TransferListing) public transfers;
     mapping(uint256 => mapping(uint32 => string)) private ticketSecrets;
     uint256 public campaignCount;
     uint256 public tokenIdCounter;
@@ -155,7 +159,9 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
             storeId: _storeId,
             secretName: _secretName,
             category: _category,
-            eventType: _eventType
+            eventType: _eventType,
+            campaignId: campaignCount
+
         });
 
         emit CampaignCreated(
@@ -184,13 +190,13 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
         emit SecretSet(campaignId, ticketIndex);
     }
 
-    function buyTicket(uint256 campaignId,string calldata imageUrl)
-        external
-        payable
-        whenNotPaused
-        nonReentrant
-        validCampaign(campaignId)
-        returns (uint256)
+    function buyTicket(uint256 campaignId, string calldata imageUrl, string calldata nillionStoreId, string calldata nillionUserId)
+    external
+    payable
+    whenNotPaused
+    nonReentrant
+    validCampaign(campaignId)
+    returns (uint256)
     {
         Campaign storage campaign = campaigns[campaignId];
 
@@ -202,10 +208,10 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
         uint256 platformFee = (msg.value * campaign.platformFeePercentage) / 100;
         uint256 sellerAmount = msg.value - platformFee;
 
-        (bool platformSuccess, ) = platformOwner.call{value: platformFee}("");
+        (bool platformSuccess,) = platformOwner.call{value: platformFee}("");
         if (!platformSuccess) revert TransferFailed();
 
-        (bool sellerSuccess, ) = campaign.owner.call{value: sellerAmount}("");
+        (bool sellerSuccess,) = campaign.owner.call{value: sellerAmount}("");
         if (!sellerSuccess) revert TransferFailed();
 
         unchecked {
@@ -223,11 +229,26 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
             owner: msg.sender,
             ticketIndex: campaign.ticketsSold - 1,
             secret: ticketSecret,
-            imageUrl: imageUrl
+            imageUrl: imageUrl,
+            nillionStoreId: nillionStoreId,
+            nillionUserId: nillionUserId,
+            nillionPidToSid: ""
         });
 
         emit TicketBought(tokenIdCounter, campaignId, msg.sender);
         return tokenIdCounter;
+    }
+
+    function redeemTicket(
+        uint256 tokenId,
+        string calldata pidToSid
+    ) external whenNotPaused {
+        Ticket storage ticket = tickets[tokenId];
+        if (ticket.owner != msg.sender) revert Unauthorized();
+        if (ticket.owner == address(0)) revert TransferNotFound();
+        Campaign storage campaign = campaigns[ticket.campaignId];
+        if (block.timestamp > campaign.expirationDate) revert CampaignExpired();
+        ticket.nillionPidToSid = pidToSid;
     }
 
     function createTransfer(uint256 tokenId, uint256 amount) external whenNotPaused returns (uint256) {
@@ -255,11 +276,11 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
     }
 
     function completeTransfer(uint256 transferId)
-        external
-        payable
-        whenNotPaused
-        nonReentrant
-        validTransfer(transferId)
+    external
+    payable
+    whenNotPaused
+    nonReentrant
+    validTransfer(transferId)
     {
         TransferListing storage transfer = transfers[transferId];
         Campaign storage campaign = campaigns[transfer.campaignId];
@@ -270,10 +291,10 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
         uint256 transferFee = (msg.value * campaign.transferFeePercentage) / 100;
         uint256 sellerAmount = msg.value - transferFee;
 
-        (bool feeSuccess, ) = campaign.owner.call{value: transferFee}("");
+        (bool feeSuccess,) = campaign.owner.call{value: transferFee}("");
         if (!feeSuccess) revert TransferFailed();
 
-        (bool sellerSuccess, ) = transfer.from.call{value: sellerAmount}("");
+        (bool sellerSuccess,) = transfer.from.call{value: sellerAmount}("");
         if (!sellerSuccess) revert TransferFailed();
 
         tickets[transfer.tokenId].owner = msg.sender;
@@ -286,9 +307,9 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
     }
 
     function cancelTransfer(uint256 transferId)
-        external
-        whenNotPaused
-        validTransfer(transferId)
+    external
+    whenNotPaused
+    validTransfer(transferId)
     {
         TransferListing storage transfer = transfers[transferId];
         if (transfer.from != msg.sender) revert Unauthorized();
@@ -297,40 +318,40 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
         emit TransferCancelled(transferId, transfer.tokenId);
     }
 
-  function getPendingTransfersByCampaign(uint256 campaignId)
+    function getPendingTransfersByCampaign(uint256 campaignId)
     external
     view
     validCampaign(campaignId)
     returns (TransferListing[] memory)
-{
-    uint256 pendingCount = 0;
-    for (uint256 i = 1; i <= transferCount; i++) {
-        if (transfers[i].campaignId == campaignId && !transfers[i].isCompleted) {
-            pendingCount++;
+    {
+        uint256 pendingCount = 0;
+        for (uint256 i = 1; i <= transferCount; i++) {
+            if (transfers[i].campaignId == campaignId && !transfers[i].isCompleted) {
+                pendingCount++;
+            }
         }
-    }
 
-    if (pendingCount == 0) {
-        return new TransferListing[](0);
-    }
-
-    TransferListing[] memory pendingTransfers = new TransferListing[](pendingCount);
-    uint256 currentIndex = 0;
-
-    for (uint256 i = 1; i <= transferCount && currentIndex < pendingCount; i++) {
-        if (transfers[i].campaignId == campaignId && !transfers[i].isCompleted) {
-            pendingTransfers[currentIndex] = transfers[i];
-            currentIndex++;
+        if (pendingCount == 0) {
+            return new TransferListing[](0);
         }
-    }
 
-    return pendingTransfers;
-}
+        TransferListing[] memory pendingTransfers = new TransferListing[](pendingCount);
+        uint256 currentIndex = 0;
+
+        for (uint256 i = 1; i <= transferCount && currentIndex < pendingCount; i++) {
+            if (transfers[i].campaignId == campaignId && !transfers[i].isCompleted) {
+                pendingTransfers[currentIndex] = transfers[i];
+                currentIndex++;
+            }
+        }
+
+        return pendingTransfers;
+    }
 
     function getCampaignsByPage(uint256 page, uint256 pageSize)
-        external
-        view
-        returns (Campaign[] memory)
+    external
+    view
+    returns (Campaign[] memory)
     {
         uint256 start = page * pageSize;
         uint256 end = start + pageSize;
@@ -349,18 +370,18 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
     }
 
     function getCampaignById(uint256 campaignId)
-        external
-        view
-        validCampaign(campaignId)
-        returns (Campaign memory)
+    external
+    view
+    validCampaign(campaignId)
+    returns (Campaign memory)
     {
         return campaigns[campaignId];
     }
 
     function getCampaignsByCountry(string calldata _country, uint256 page, uint256 pageSize)
-        external
-        view
-        returns (Campaign[] memory)
+    external
+    view
+    returns (Campaign[] memory)
     {
         uint256 matchCount = 0;
         for (uint256 i = 1; i <= campaignCount; i++) {
@@ -400,9 +421,9 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
     }
 
     function getCampaignsByCity(string calldata _city, uint256 page, uint256 pageSize)
-        external
-        view
-        returns (Campaign[] memory)
+    external
+    view
+    returns (Campaign[] memory)
     {
         uint256 matchCount = 0;
         for (uint256 i = 1; i <= campaignCount; i++) {
@@ -442,14 +463,14 @@ contract TicketingSystem is ERC721, AccessControl, ReentrancyGuard, Pausable {
     }
 
 
-function getTransfer(uint256 transferId) external view returns (TransferListing memory) {
-    return transfers[transferId];
-}
+    function getTransfer(uint256 transferId) external view returns (TransferListing memory) {
+        return transfers[transferId];
+    }
 
     function getTicket(uint256 tokenId)
-        external
-        view
-        returns (Ticket memory)
+    external
+    view
+    returns (Ticket memory)
     {
         if (tickets[tokenId].owner != msg.sender &&
             msg.sender != campaigns[tickets[tokenId].campaignId].owner) {
@@ -458,10 +479,39 @@ function getTransfer(uint256 transferId) external view returns (TransferListing 
         return tickets[tokenId];
     }
 
+    function getUserTickets(address user)
+    external
+    view
+    returns (Ticket[] memory)
+    {
+        // First, count the number of tickets owned by the user
+        uint256 userTicketCount = 0;
+        for (uint256 i = 1; i <= tokenIdCounter; i++) {
+            if (tickets[i].owner == user) {
+                userTicketCount++;
+            }
+        }
+
+        // Create array with the exact size needed
+        Ticket[] memory userTickets = new Ticket[](userTicketCount);
+
+        // Fill the array with user's tickets
+        uint256 currentIndex = 0;
+        for (uint256 i = 1; i <= tokenIdCounter; i++) {
+            if (tickets[i].owner == user) {
+                userTickets[currentIndex] = tickets[i];
+                currentIndex++;
+            }
+        }
+
+        return userTickets;
+    }
+
+
     function getTicketSecret(uint256 tokenId)
-        external
-        view
-        returns (string memory)
+    external
+    view
+    returns (string memory)
     {
         Ticket storage ticket = tickets[tokenId];
         if (ticket.owner != msg.sender &&
@@ -472,10 +522,10 @@ function getTransfer(uint256 transferId) external view returns (TransferListing 
     }
 
     function getCampaignTickets(uint256 campaignId)
-        external
-        view
-        validCampaign(campaignId)
-        returns (Ticket[] memory)
+    external
+    view
+    validCampaign(campaignId)
+    returns (Ticket[] memory)
     {
         Campaign storage campaign = campaigns[campaignId];
         if (campaign.owner != msg.sender) revert Unauthorized();
@@ -494,29 +544,29 @@ function getTransfer(uint256 transferId) external view returns (TransferListing 
     }
 
     function pause()
-        external
-        onlyRole(DEFAULT_ADMIN_ROLE)
+    external
+    onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _pause();
     }
 
     function unpause()
-        external
-        onlyRole(DEFAULT_ADMIN_ROLE)
+    external
+    onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _unpause();
     }
 
     function setUpdater(address account)
-        external
-        onlyRole(DEFAULT_ADMIN_ROLE)
+    external
+    onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _grantRole(UPDATER_ROLE, account);
     }
 
     function removeUpdater(address account)
-        external
-        onlyRole(DEFAULT_ADMIN_ROLE)
+    external
+    onlyRole(DEFAULT_ADMIN_ROLE)
     {
         _revokeRole(UPDATER_ROLE, account);
     }
