@@ -140,7 +140,7 @@ export function useTicketingSystem() {
 			abi: ticketingSystemABI,
 			functionName: "buyTicket",
 			value: BigInt(price),
-			args: [campaignId, imageUrl],
+			args: [campaignId, imageUrl, "store123", "user123"],
 		});
 	};
 
