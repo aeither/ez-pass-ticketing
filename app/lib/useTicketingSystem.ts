@@ -8,7 +8,8 @@ import {
 } from "wagmi";
 import { abi as ticketingSystemABI } from "./abi";
 
-const TICKETING_SYSTEM_ADDRESS = "0xF5D6fB2aAca795684f3fc4319d2Bb282a722B14a";
+// const COUNTER_ADDRESS = "0xA2DD26D1e1b87975692ab9efdD84177BC16fcA98";
+const TICKETING_SYSTEM_ADDRESS = "0x150696D367eE549e5BaA8e91D2d825A2DA9ec3AE";
 
 export function useTicketingSystem() {
 	const { writeContract, data: hash } = useWriteContract({
