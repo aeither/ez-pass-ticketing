@@ -135,7 +135,7 @@ export function useTicketingSystem() {
 			address: SIMPLE_TICKETING_SYSTEM_ADDRESS,
 			abi: simpleTicketingSystemABI,
 			functionName: "createCampaign",
-			args: ["hello", BigInt(1), BigInt(1), BigInt(1)],
+			args: ["hello", BigInt(1), BigInt(1)],
 		});
 	};
 

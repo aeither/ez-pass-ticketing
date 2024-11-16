@@ -25,7 +25,6 @@ export const abi = [
 				type: "uint256",
 				internalType: "uint256",
 			},
-			{ name: "expiryDate", type: "uint256", internalType: "uint256" },
 			{ name: "active", type: "bool", internalType: "bool" },
 		],
 		stateMutability: "view",
@@ -45,11 +44,6 @@ export const abi = [
 				type: "uint256",
 				internalType: "uint256",
 			},
-			{
-				name: "_durationInDays",
-				type: "uint256",
-				internalType: "uint256",
-			},
 		],
 		outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
 		stateMutability: "nonpayable",
@@ -62,7 +56,7 @@ export const abi = [
 			{
 				name: "",
 				type: "tuple",
-				internalType: "struct TicketingSystem.Campaign",
+				internalType: "struct SimpleTicketingSystem.Campaign",
 				components: [
 					{ name: "id", type: "uint256", internalType: "uint256" },
 					{ name: "owner", type: "address", internalType: "address" },
@@ -79,11 +73,6 @@ export const abi = [
 					},
 					{
 						name: "availableTickets",
-						type: "uint256",
-						internalType: "uint256",
-					},
-					{
-						name: "expiryDate",
 						type: "uint256",
 						internalType: "uint256",
 					},
@@ -104,7 +93,7 @@ export const abi = [
 			{
 				name: "",
 				type: "tuple[]",
-				internalType: "struct TicketingSystem.Ticket[]",
+				internalType: "struct SimpleTicketingSystem.Ticket[]",
 				components: [
 					{
 						name: "campaignId",
@@ -206,7 +195,6 @@ export const abi = [
 		],
 		anonymous: false,
 	},
-	{ type: "error", name: "CampaignExpired", inputs: [] },
 	{ type: "error", name: "CampaignNotActive", inputs: [] },
 	{ type: "error", name: "InsufficientPayment", inputs: [] },
 	{ type: "error", name: "NoTicketsAvailable", inputs: [] },

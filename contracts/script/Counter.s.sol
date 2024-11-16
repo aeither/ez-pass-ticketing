@@ -2,17 +2,17 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {TicketingSystem} from "../src/Counter.sol";
+import {SimpleTicketingSystem} from "../src/Counter.sol";
 
 contract CounterScript is Script {
-    TicketingSystem public counter;
+    SimpleTicketingSystem public counter;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        counter = new TicketingSystem();
+        counter = new SimpleTicketingSystem();
 
         vm.stopBroadcast();
     }

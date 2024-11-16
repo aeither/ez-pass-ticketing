@@ -1,10 +1,13 @@
 // app/counter/page.tsx
 "use client";
 
+import { abi as abiCounter } from "@/lib/abiCounter";
 import { abi as simpleTicketingSystemABI } from "@/lib/abiSimpleTicketing";
 import { SIMPLE_TICKETING_SYSTEM_ADDRESS } from "@/lib/constants";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
+
+const COUNTER_ADDRESS = "0xA2DD26D1e1b87975692ab9efdD84177BC16fcA98"; // mainnnet
 
 export default function CounterPage() {
 	const [newNumber, setNewNumber] = useState<number>(0);
@@ -23,6 +26,30 @@ export default function CounterPage() {
 		}
 	}, []);
 
+	const doSomething = async () => {
+		if (!MiniKit.isInstalled()) {
+			alert("Please install MiniKit");
+			return;
+		}
+
+		try {
+			const { commandPayload, finalPayload } =
+				await MiniKit.commandsAsync.sendTransaction({
+					transaction: [
+						{
+							address: COUNTER_ADDRESS,
+							abi: abiCounter,
+							functionName: "increment",
+							args: [],
+						},
+					],
+				});
+			console.log("Transaction sent:", finalPayload);
+		} catch (error) {
+			console.error("Error:", error);
+			alert("Transaction failed");
+		}
+	};
 	const increment = async () => {
 		if (!MiniKit.isInstalled()) {
 			alert("Please install MiniKit");
@@ -37,7 +64,7 @@ export default function CounterPage() {
 							address: SIMPLE_TICKETING_SYSTEM_ADDRESS,
 							abi: simpleTicketingSystemABI,
 							functionName: "createCampaign",
-							args: ["hello", BigInt(1), BigInt(1), BigInt(1)],
+							args: ["hello", BigInt(1), BigInt(1)],
 						},
 					],
 				});

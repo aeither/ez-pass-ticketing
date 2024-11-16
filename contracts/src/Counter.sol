@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract TicketingSystem {
+contract SimpleTicketingSystem {
     struct Campaign {
         uint256 id;
         address owner;
@@ -9,7 +9,6 @@ contract TicketingSystem {
         uint256 ticketPrice;
         uint256 totalTickets;
         uint256 availableTickets;
-        uint256 expiryDate;
         bool active;
     }
 
@@ -33,13 +32,11 @@ contract TicketingSystem {
     error NoTicketsAvailable();
     error TicketAlreadyRedeemed();
     error NotTicketOwner();
-    error CampaignExpired();
 
     function createCampaign(
         string memory _name,
         uint256 _ticketPrice,
-        uint256 _totalTickets,
-        uint256 _durationInDays
+        uint256 _totalTickets
     ) external returns (uint256) {
         campaignCounter++;
         
@@ -50,7 +47,6 @@ contract TicketingSystem {
             ticketPrice: _ticketPrice,
             totalTickets: _totalTickets,
             availableTickets: _totalTickets,
-            expiryDate: block.timestamp + (_durationInDays * 1 days),
             active: true
         });
 
@@ -62,7 +58,6 @@ contract TicketingSystem {
         Campaign storage campaign = campaigns[_campaignId];
         
         if (!campaign.active) revert CampaignNotActive();
-        if (block.timestamp >= campaign.expiryDate) revert CampaignExpired();
         if (campaign.availableTickets == 0) revert NoTicketsAvailable();
         if (msg.value < campaign.ticketPrice) revert InsufficientPayment();
 
@@ -89,7 +84,6 @@ contract TicketingSystem {
         
         if (_ticketIndex >= tickets.length) revert NotTicketOwner();
         if (tickets[_ticketIndex].isRedeemed) revert TicketAlreadyRedeemed();
-        if (block.timestamp >= campaigns[_campaignId].expiryDate) revert CampaignExpired();
 
         tickets[_ticketIndex].isRedeemed = true;
         
