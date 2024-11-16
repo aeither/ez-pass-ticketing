@@ -95,7 +95,7 @@ export function useTicketingSystem() {
 			args: [
 				"Test Event", // name
 				"Description", // description
-				parseEther("0.0000001"), // pricePerTicket
+				parseEther("0.0000000"), // pricePerTicket
 				5, // platformFeePercentage
 				2, // transferFeePercentage
 				Math.floor(Date.now() / 1000), // startDate
