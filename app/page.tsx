@@ -5,7 +5,6 @@ import {
 	Megaphone,
 	PlusCircle,
 	Send,
-	Ticket,
 	Wallet
 } from "lucide-react";
 import Link from "next/link";
@@ -90,11 +89,11 @@ export default function LandingPage() {
 							description="Explore exciting event campaigns and be the first to know about upcoming experiences."
 						/>
 					</Link>
-					<FeatureCard
+					{/* <FeatureCard
 						icon={<Ticket className="h-8 w-8 text-purple-600" />}
 						title="Buy Tickets"
 						description="Purchase tickets quickly and securely for your favorite events."
-					/>
+					/> */}
 					<Link href="/world/tickets">
 						<FeatureCard
 							icon={<Wallet className="h-8 w-8 text-purple-600" />}

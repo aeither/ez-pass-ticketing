@@ -181,6 +181,7 @@ export default function CreateCampaignPage() {
 					],
 				});
 			console.log("Transaction sent:", finalPayload);
+			window.location.href = '/';
 		} catch (error) {
 			console.error("Error:", error);
 			alert("Transaction failed");

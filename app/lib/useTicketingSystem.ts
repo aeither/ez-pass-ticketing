@@ -209,6 +209,8 @@ export function useTicketingSystem() {
 
 	// Get Campaigns by Page
 	const useCampaignsByPage = (pageNumber: number, pageSize: number) => {
+		console.log("useCampaignsByPage", pageNumber, pageSize);
+
 		return useReadContract({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
