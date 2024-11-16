@@ -5,8 +5,8 @@ import { abi } from "@/lib/abiCounter";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useState } from "react";
 
-// const COUNTER_ADDRESS = "0xA2DD26D1e1b87975692ab9efdD84177BC16fcA98"; mainnnet
-const COUNTER_ADDRESS = "0x6d9A382368B8900475DD4e69DC5Dbf6f3dc0B36f";
+const COUNTER_ADDRESS = "0xA2DD26D1e1b87975692ab9efdD84177BC16fcA98"; // mainnnet
+// const COUNTER_ADDRESS = "0x6d9A382368B8900475DD4e69DC5Dbf6f3dc0B36f"; // testnet
 
 export default function CounterPage() {
 	const [newNumber, setNewNumber] = useState<number>(0);
