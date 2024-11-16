@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export function Header() {
@@ -31,7 +30,7 @@ export function Header() {
 						My Tickets
 					</Link>
 				</nav>
-				<Button variant="outline">Sign In</Button>
+				{/* <Button variant="outline">Sign In</Button> */}
 			</div>
 		</header>
 	);
