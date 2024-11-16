@@ -5,14 +5,15 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http } from "viem";
 import { WagmiProvider } from "wagmi";
-import { worldchainSepolia } from "wagmi/chains";
+import { celoAlfajores, worldchain } from "wagmi/chains";
 
 const config = getDefaultConfig({
 	appName: "My RainbowKit App",
 	projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID as string,
-	chains: [worldchainSepolia],
+	chains: [worldchain, celoAlfajores],
 	transports: {
-		[worldchainSepolia.id]: http(),
+		[worldchain.id]: http(),
+		[celoAlfajores.id]: http(),
 	},
 	ssr: true,
 });

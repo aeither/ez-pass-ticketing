@@ -7,11 +7,17 @@ import {
 	useWriteContract,
 } from "wagmi";
 import { abi as ticketingSystemABI } from "./abi";
+import { readClient } from "./readClient";
 
-const TICKETING_SYSTEM_ADDRESS = "0x150696D367eE549e5BaA8e91D2d825A2DA9ec3AE";
+const TICKETING_SYSTEM_ADDRESS = "0x19a081e99566b32Bb6a306D3B144adE71b13aB78";
+const BASE_EXPLORER_URL = "https://worldscan.org";
 
 export function useTicketingSystem() {
-	const { writeContract, data: hash } = useWriteContract({
+	const {
+		writeContract,
+		writeContractAsync,
+		data: hash,
+	} = useWriteContract({
 		mutation: {
 			onSuccess(data) {
 				console.log("Transaction hash:", data);
@@ -41,7 +47,7 @@ export function useTicketingSystem() {
 				action: {
 					label: "View on WorldScan",
 					onClick: () =>
-						window.open(`https://sepolia.worldscan.org/tx/${hash}`, "_blank"),
+						window.open(`${BASE_EXPLORER_URL}/tx/${hash}`, "_blank"),
 				},
 				duration: 5000,
 			});
@@ -82,48 +88,65 @@ export function useTicketingSystem() {
 		category: string;
 		eventType: string;
 	}) => {
-		return writeContract({
+		return writeContractAsync({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
 			functionName: "createCampaign",
 			args: [
-				name,
-				description,
-				parseEther(pricePerTicket),
-				platformFeePercentage,
-				transferFeePercentage,
-				startDate,
-				expirationDate,
-				imageUrl,
-				city,
-				country,
-				ticketsAvailable,
-				storeId,
-				secretName,
-				category,
-				eventType,
+				"Test Event", // name
+				"Description", // description
+				parseEther("0.0000001"), // pricePerTicket
+				5, // platformFeePercentage
+				2, // transferFeePercentage
+				startDate, // startDate
+				expirationDate, // expirationDate
+				"image.jpg", // imageUrl
+				"New York", // city
+				"USA", // country
+				100, // ticketsAvailable
+				"store123", // storeId
+				"secret123", // secretName
+				"Music", // category
+				"Concert", // eventType
+				// name,
+				// description,
+				// parseEther(pricePerTicket),
+				// platformFeePercentage,
+				// transferFeePercentage,
+				// startDate,
+				// expirationDate,
+				// imageUrl,
+				// city,
+				// country,
+				// ticketsAvailable,
+				// storeId,
+				// secretName,
+				// category,
+				// eventType,
 			],
 		});
 	};
 
 	// Buy Ticket
 	const buyTicket = async (
-		campaignId: string,
+		campaignId: bigint,
 		price: string,
 		imageUrl: string,
 	) => {
-		return writeContract({
+		console.log("price", price);
+
+		return writeContractAsync({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
 			functionName: "buyTicket",
-			value: parseEther(price),
-			args: [BigInt(campaignId), imageUrl],
+			value: BigInt(price),
+			args: [campaignId, imageUrl],
 		});
 	};
 
 	// Create Transfer
 	const createTransfer = async (tokenId: bigint, amount: string) => {
-		return writeContract({
+		return writeContractAsync({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
 			functionName: "createTransfer",
@@ -133,7 +156,7 @@ export function useTicketingSystem() {
 
 	// Complete Transfer
 	const completeTransfer = async (transferId: bigint, amount: string) => {
-		return writeContract({
+		return writeContractAsync({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
 			functionName: "completeTransfer",
@@ -144,7 +167,7 @@ export function useTicketingSystem() {
 
 	// Cancel Transfer
 	const cancelTransfer = async (transferId: bigint) => {
-		return writeContract({
+		return writeContractAsync({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
 			functionName: "cancelTransfer",
@@ -153,12 +176,12 @@ export function useTicketingSystem() {
 	};
 
 	// Get Campaign by ID
-	const useCampaign = (campaignId: number) => {
+	const useCampaign = (campaignId: number | undefined) => {
 		return useReadContract({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
 			functionName: "getCampaignById",
-			args: [BigInt(campaignId)],
+			args: campaignId ? [BigInt(campaignId)] : undefined,
 		});
 	};
 
@@ -206,6 +229,22 @@ export function useTicketingSystem() {
 		});
 	};
 
+	// Get User Tickets
+	const getUserTickets = async (userAddress: string) => {
+		try {
+			const data = await readClient.readContract({
+				address: TICKETING_SYSTEM_ADDRESS,
+				abi: ticketingSystemABI,
+				functionName: "getUserTickets",
+				args: [userAddress as `0x${string}`],
+			});
+			return data;
+		} catch (error) {
+			console.error("Error fetching user tickets:", error);
+			throw error;
+		}
+	};
+
 	return {
 		createCampaign,
 		buyTicket,
@@ -217,6 +256,7 @@ export function useTicketingSystem() {
 		useCampaignsByPage,
 		useCampaignsByCountry,
 		useCampaignsByCity,
+		getUserTickets,
 		isConfirmed,
 		isConfirming,
 	};

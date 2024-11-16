@@ -33,7 +33,7 @@ export default function RootLayout({
 							<ErudaProvider>
 								<ClientWrapper>
 									<main>{children}</main>
-									<Toaster />
+									<Toaster position="top-center" />
 								</ClientWrapper>
 							</ErudaProvider>
 						</CirclesSDKProvider>
