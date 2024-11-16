@@ -31,12 +31,12 @@ export default function PaymentPage() {
 
 			const payload: PayCommandInput = {
 				reference: id,
-				to: "0xD04D21acfd53AacedF705f92C31161b276cdA123", // Test address
+				to: "0xB09610C0bE56604A0eE39d9Ef8d5cB053612Cc93", // Test address
 				tokens: [
-					// {
-					// 	symbol: Tokens.WLD,
-					// 	token_amount: tokenToDecimals(0.0001, Tokens.WLD).toString(),
-					// },
+					{
+						symbol: Tokens.WLD,
+						token_amount: tokenToDecimals(0.0001, Tokens.WLD).toString(),
+					},
 					{
 						symbol: Tokens.USDCE,
 						token_amount: tokenToDecimals(0.01, Tokens.USDCE).toString(),
