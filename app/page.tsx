@@ -10,8 +10,9 @@ export default function Home() {
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-center p-24">
 			<div className="flex flex-row p-2 gap-2">
-				<a href="/verify">World Verify</a>
-				<a href="/pay">World Pay</a>
+				<a className="border p-2 rounded-md" href="/verify">World Verify</a>
+				<a className="border p-2 rounded-md" href="/pay">World Pay</a>
+				<a className="border p-2 rounded-md" href="/world-interact">World Interact</a>
 			</div>
 			<div className="w-full flex flex-col items-center font-mono text-sm">
 				<Image
