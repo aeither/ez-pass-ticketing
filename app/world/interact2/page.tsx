@@ -2,7 +2,6 @@
 "use client";
 
 import { abi as ticketingSystemABI } from "@/lib/abi";
-import { abi } from "@/lib/abiCounter";
 import { TICKETING_SYSTEM_ADDRESS } from "@/lib/constants";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
@@ -38,41 +37,18 @@ export default function CounterPage() {
 				await MiniKit.commandsAsync.sendTransaction({
 					transaction: [
 						{
-							address: COUNTER_ADDRESS,
-							abi: abi,
-							functionName: "increment",
-							args: [],
-						},
-					],
-				});
-			console.log("Transaction sent:", finalPayload);
-		} catch (error) {
-			console.error("Error:", error);
-			alert("Transaction failed");
-		}
-	};
-
-	const setNumber = async () => {
-		if (!MiniKit.isInstalled()) {
-			alert("Please install MiniKit");
-			return;
-		}
-
-		try {
-			const { commandPayload, finalPayload } =
-				await MiniKit.commandsAsync.sendTransaction({
-					transaction: [
-						{
 							address: TICKETING_SYSTEM_ADDRESS,
 							abi: ticketingSystemABI,
 							functionName: "setNumber",
-							args: [								"Test Event", // name
+							args: [
+								"Test Event", // name
+								"Test Event", // name
 								"Description", // description
 								parseEther("0.0000001"), // pricePerTicket
 								5, // platformFeePercentage
 								2, // transferFeePercentage
-								new Date(formData.startDate).getTime() / 1000, // startDate
-								expirationTimestamp, // expirationDate
+								Math.floor(Date.now() / 1000), // startDate
+								Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // expirationDate
 								"image.jpg", // imageUrl
 								"New York", // city
 								"USA", // country
@@ -80,7 +56,8 @@ export default function CounterPage() {
 								"store123", // storeId
 								"secret123", // secretName
 								"Music", // category
-								"Concert", // eventType],
+								"Concert", // eventType
+							],
 						},
 					],
 				});
@@ -127,13 +104,6 @@ export default function CounterPage() {
 					className="px-4 py-2 border rounded"
 					placeholder="Enter new number"
 				/>
-				<button
-					type="button"
-					onClick={setNumber}
-					className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-				>
-					Set Number
-				</button>
 			</div>
 		</main>
 	);
