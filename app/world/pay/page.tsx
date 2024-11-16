@@ -22,7 +22,7 @@ export default function PaymentPage() {
 		"0xD04D21acfd53AacedF705f92C31161b276cdA123",
 	);
 	const [wldAmount, setWldAmount] = useState("0.0001");
-	const [usdcAmount, setUsdcAmount] = useState("0.01");
+	const [usdcAmount, setUsdcAmount] = useState("0.001");
 
 	const validateInputs = () => {
 		if (!isAddress(recipientAddress)) {
@@ -82,6 +82,7 @@ export default function PaymentPage() {
 			};
 
 			const { finalPayload } = await MiniKit.commandsAsync.pay(payload);
+			console.log("🚀 ~ sendPayment ~ finalPayload:", finalPayload)
 
 			if (finalPayload.status === "success") {
 				const confirmRes = await fetch("/api/confirm-payment", {
@@ -90,6 +91,7 @@ export default function PaymentPage() {
 					body: JSON.stringify(finalPayload),
 				});
 				const payment = await confirmRes.json();
+				console.log("🚀 ~ sendPayment ~ payment:", payment)
 
 				if (payment.success) {
 					toast.success("Your payment has been processed successfully!");
