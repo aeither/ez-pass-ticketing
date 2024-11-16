@@ -98,8 +98,8 @@ export function useTicketingSystem() {
 				parseEther("0.0000001"), // pricePerTicket
 				5, // platformFeePercentage
 				2, // transferFeePercentage
-				startDate, // startDate
-				expirationDate, // expirationDate
+				Math.floor(Date.now() / 1000), // startDate
+				Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60, // expirationDate
 				"image.jpg", // imageUrl
 				"New York", // city
 				"USA", // country

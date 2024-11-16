@@ -7,8 +7,6 @@ import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
 import { parseEther } from "viem";
 
-const COUNTER_ADDRESS = "0xA2DD26D1e1b87975692ab9efdD84177BC16fcA98"; // mainnnet
-
 export default function CounterPage() {
 	const [newNumber, setNewNumber] = useState<number>(0);
 	const [userDetails, setUserDetails] = useState({
@@ -39,9 +37,8 @@ export default function CounterPage() {
 						{
 							address: TICKETING_SYSTEM_ADDRESS,
 							abi: ticketingSystemABI,
-							functionName: "setNumber",
+							functionName: "createCampaign",
 							args: [
-								"Test Event", // name
 								"Test Event", // name
 								"Description", // description
 								parseEther("0.0000001"), // pricePerTicket
