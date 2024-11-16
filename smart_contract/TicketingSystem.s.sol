@@ -46,7 +46,12 @@ contract TicketingSystemTest is Test {
         vm.deal(buyer, 1 ether);
 
         vm.prank(buyer);
-        uint256 tokenId = system.buyTicket{value: TICKET_PRICE}(campaignId, "test-image.jpg");
+        uint256 tokenId = system.buyTicket{value: TICKET_PRICE}(
+            campaignId,
+            "test-image.jpg",
+            "store123",  // nillionStoreId
+            "user123"    // nillionUserId
+        );
 
         // Verify ticket ownership
         assertEq(system.ownerOf(tokenId), buyer);
@@ -55,6 +60,51 @@ contract TicketingSystemTest is Test {
         TicketingSystem.Ticket memory ticket = system.getTicket(tokenId);
         assertEq(ticket.owner, buyer);
         assertEq(ticket.campaignId, campaignId);
+        assertEq(ticket.nillionStoreId, "store123");
+        assertEq(ticket.nillionUserId, "user123");
+        assertEq(ticket.nillionPidToSid, ""); // Should be empty initially
+    }
+
+    function test_RedeemTicket() public {
+        uint256 campaignId = _createCampaign();
+        vm.deal(buyer, 1 ether);
+
+        // Buy ticket
+        vm.prank(buyer);
+        uint256 tokenId = system.buyTicket{value: TICKET_PRICE}(
+            campaignId,
+            "test-image.jpg",
+            "store123",
+            "user123"
+        );
+
+        // Redeem ticket
+        vm.prank(buyer);
+        system.redeemTicket(tokenId, "pid2sid123");
+
+        // Verify redemption
+        vm.prank(buyer);
+        TicketingSystem.Ticket memory ticket = system.getTicket(tokenId);
+        assertEq(ticket.nillionPidToSid, "pid2sid123");
+    }
+
+    function test_RedeemTicket_Unauthorized() public {
+        uint256 campaignId = _createCampaign();
+        vm.deal(buyer, 1 ether);
+
+        // Buy ticket
+        vm.prank(buyer);
+        uint256 tokenId = system.buyTicket{value: TICKET_PRICE}(
+            campaignId,
+            "test-image.jpg",
+            "store123",
+            "user123"
+        );
+
+        // Try to redeem with wrong address
+        vm.prank(buyer2);
+        vm.expectRevert(TicketingSystem.Unauthorized.selector);
+        system.redeemTicket(tokenId, "pid2sid123");
     }
 
     function test_TransferTicket() public {
@@ -63,7 +113,12 @@ contract TicketingSystemTest is Test {
         vm.deal(buyer, 1 ether);
 
         vm.prank(buyer);
-        uint256 tokenId = system.buyTicket{value: TICKET_PRICE}(campaignId, "test-image.jpg");
+        uint256 tokenId = system.buyTicket{value: TICKET_PRICE}(
+            campaignId,
+            "test-image.jpg",
+            "store123",
+            "user123"
+        );
 
         // Create transfer listing
         vm.prank(buyer);
@@ -80,6 +135,8 @@ contract TicketingSystemTest is Test {
         vm.prank(buyer2);
         TicketingSystem.Ticket memory ticket = system.getTicket(tokenId);
         assertEq(ticket.owner, buyer2);
+        assertEq(ticket.nillionStoreId, "store123"); // Verify Nillion fields persist
+        assertEq(ticket.nillionUserId, "user123");
     }
 
     function test_GetTransfer() public {
@@ -88,7 +145,12 @@ contract TicketingSystemTest is Test {
         vm.deal(buyer, 1 ether);
 
         vm.prank(buyer);
-        uint256 tokenId = system.buyTicket{value: TICKET_PRICE}(campaignId, "test-image.jpg");
+        uint256 tokenId = system.buyTicket{value: TICKET_PRICE}(
+            campaignId,
+            "test-image.jpg",
+            "store123",
+            "user123"
+        );
 
         // Create transfer listing
         vm.prank(buyer);
