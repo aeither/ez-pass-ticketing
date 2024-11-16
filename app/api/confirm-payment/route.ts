@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
 	// IMPORTANT: Here we should fetch the reference you created in /initiate-payment to ensure the transaction we are verifying is the same one we initiated
 	// const reference = getReferenceFromDB();
-    const reference = "mockUUID"
+	const reference = "mockUUID";
 
 	// 1. Check that the transaction we received from the mini app is the same one we sent
 	if (payload.reference === reference) {
@@ -27,9 +27,12 @@ export async function POST(req: NextRequest) {
 
 		// 2. Here we optimistically confirm the transaction.
 		// Otherwise, you can poll until the status == mined
-		if (transaction.reference === reference && transaction.status !== "failed") {
+		if (
+			transaction.reference === reference &&
+			transaction.status !== "failed"
+		) {
 			return NextResponse.json({ success: true });
 		}
-			return NextResponse.json({ success: false });
+		return NextResponse.json({ success: false });
 	}
 }
