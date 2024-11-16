@@ -52,6 +52,20 @@ export default function LandingPage() {
 					id="features"
 					className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
 				>
+					<Link href="/world/interact">
+						<FeatureCard
+							icon={<Send className="h-8 w-8 text-purple-600" />}
+							title="Interact"
+							description="Interact 1."
+						/>
+					</Link>
+					<Link href="/world/interact2">
+						<FeatureCard
+							icon={<Send className="h-8 w-8 text-purple-600" />}
+							title="Interact2"
+							description="Interact 2."
+						/>
+					</Link>
 					<FeatureCard
 						icon={<Globe className="h-8 w-8 text-purple-600" />}
 						title="World ID Verification"
