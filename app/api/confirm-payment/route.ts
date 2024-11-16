@@ -7,6 +7,7 @@ interface IRequestPayload {
 
 export async function POST(req: NextRequest) {
 	const { payload } = (await req.json()) as IRequestPayload;
+	console.log("🚀 ~ POST ~ payload:", payload)
 
 	// IMPORTANT: Here we should fetch the reference you created in /initiate-payment to ensure the transaction we are verifying is the same one we initiated
 	// const reference = getReferenceFromDB();
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
 			},
 		);
 		const transaction = await response.json();
+		console.log("🚀 ~ POST ~ transaction:", transaction)
 
 		// 2. Here we optimistically confirm the transaction.
 		// Otherwise, you can poll until the status == mined
