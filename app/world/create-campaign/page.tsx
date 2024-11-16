@@ -61,21 +61,21 @@ export default function CreateCampaignPage() {
 							abi: ticketingSystemABI,
 							functionName: "createCampaign",
 							args: [
-								formData.name,
-								formData.description,
-								parseEther(formData.pricePerTicket),
-								formData.platformFeePercentage,
-								formData.transferFeePercentage,
-								BigInt(startTimestamp),
-								BigInt(expirationTimestamp),
-								formData.imageUrl,
-								formData.city,
-								formData.country,
-								formData.ticketsAvailable,
-								formData.storeId,
-								formData.secretName,
-								formData.category,
-								formData.eventType,
+								"Test Event", // name
+								"Description", // description
+								parseEther("0.0000001"), // pricePerTicket
+								5, // platformFeePercentage
+								2, // transferFeePercentage
+								startTimestamp, // startDate
+								expirationTimestamp, // expirationDate
+								"image.jpg", // imageUrl
+								"New York", // city
+								"USA", // country
+								100, // ticketsAvailable
+								"store123", // storeId
+								"secret123", // secretName
+								"Music", // category
+								"Concert", // eventType
 							],
 						},
 					],
@@ -223,7 +223,7 @@ export default function CreateCampaignPage() {
 				/>
 
 				<button
-                type="button"
+					type="button"
 					onClick={createCampaign}
 					className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
 				>
