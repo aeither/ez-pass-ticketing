@@ -12,6 +12,24 @@ import {
 import Link from "next/link";
 import { Header } from "./components/Header";
 
+interface FeatureCardProps {
+	icon: React.ReactNode;
+	title: string;
+	description: string;
+}
+
+interface CampaignCardProps {
+	title: string;
+	date: string;
+	image: string;
+}
+
+interface TicketItemProps {
+	title: string;
+	date: string;
+	location: string;
+}
+
 export default function LandingPage() {
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900">
@@ -156,7 +174,7 @@ export default function LandingPage() {
 	);
 }
 
-function FeatureCard({ icon, title, description }) {
+function FeatureCard({ icon, title, description }: FeatureCardProps) {
 	return (
 		<Card className="hover:shadow-lg transition-shadow duration-300">
 			<CardContent className="p-6">
@@ -168,7 +186,7 @@ function FeatureCard({ icon, title, description }) {
 	);
 }
 
-function CampaignCard({ title, date, image }) {
+function CampaignCard({ title, date, image }: CampaignCardProps) {
 	return (
 		<Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
 			<img src={image} alt={title} className="w-full h-48 object-cover" />
@@ -183,7 +201,7 @@ function CampaignCard({ title, date, image }) {
 	);
 }
 
-function TicketItem({ title, date, location }) {
+function TicketItem({ title, date, location }: TicketItemProps) {
 	return (
 		<div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
 			<div>

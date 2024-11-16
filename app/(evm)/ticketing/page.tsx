@@ -57,7 +57,7 @@ export default function EventsPage() {
 	const fetchUserTickets = async () => {
 		if (!address) return;
 		try {
-			const tickets = await getUserTickets(address);
+			const tickets = (await getUserTickets(address)) as any[];
 			console.log("🚀 ~ fetchUserTickets ~ tickets:", tickets);
 			setUserTickets(tickets);
 		} catch (error: any) {
@@ -82,7 +82,7 @@ export default function EventsPage() {
 		}
 	};
 
-	const handleBuyTicket = async (campaignId: string) => {
+	const handleBuyTicket = async (campaignId: bigint) => {
 		if (!campaign?.pricePerTicket) {
 			toast.error("Invalid ticket price");
 			return;
