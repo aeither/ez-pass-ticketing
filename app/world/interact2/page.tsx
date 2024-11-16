@@ -1,9 +1,12 @@
 // app/counter/page.tsx
 "use client";
 
+import { abi as ticketingSystemABI } from "@/lib/abi";
 import { abi } from "@/lib/abiCounter";
+import { TICKETING_SYSTEM_ADDRESS } from "@/lib/constants";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useEffect, useState } from "react";
+import { parseEther } from "viem";
 
 const COUNTER_ADDRESS = "0xA2DD26D1e1b87975692ab9efdD84177BC16fcA98"; // mainnnet
 
@@ -60,10 +63,24 @@ export default function CounterPage() {
 				await MiniKit.commandsAsync.sendTransaction({
 					transaction: [
 						{
-							address: COUNTER_ADDRESS,
-							abi: abi,
+							address: TICKETING_SYSTEM_ADDRESS,
+							abi: ticketingSystemABI,
 							functionName: "setNumber",
-							args: [newNumber],
+							args: [								"Test Event", // name
+								"Description", // description
+								parseEther("0.0000001"), // pricePerTicket
+								5, // platformFeePercentage
+								2, // transferFeePercentage
+								new Date(formData.startDate).getTime() / 1000, // startDate
+								expirationTimestamp, // expirationDate
+								"image.jpg", // imageUrl
+								"New York", // city
+								"USA", // country
+								100, // ticketsAvailable
+								"store123", // storeId
+								"secret123", // secretName
+								"Music", // category
+								"Concert", // eventType],
 						},
 					],
 				});
