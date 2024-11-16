@@ -82,16 +82,18 @@ export default function PaymentPage() {
 			};
 
 			const { finalPayload } = await MiniKit.commandsAsync.pay(payload);
-			console.log("🚀 ~ sendPayment ~ finalPayload:", finalPayload)
+			console.log("🚀 ~ sendPayment ~ finalPayload:", finalPayload);
 
 			if (finalPayload.status === "success") {
 				const confirmRes = await fetch("/api/confirm-payment", {
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify(finalPayload),
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ payload: finalPayload }),
 				});
 				const payment = await confirmRes.json();
-				console.log("🚀 ~ sendPayment ~ payment:", payment)
+				console.log("🚀 ~ sendPayment ~ payment:", payment);
 
 				if (payment.success) {
 					toast.success("Your payment has been processed successfully!");
