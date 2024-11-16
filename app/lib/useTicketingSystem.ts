@@ -8,7 +8,6 @@ import {
 } from "wagmi";
 import { abi as ticketingSystemABI } from "./abi";
 
-// const COUNTER_ADDRESS = "0xA2DD26D1e1b87975692ab9efdD84177BC16fcA98";
 const TICKETING_SYSTEM_ADDRESS = "0x150696D367eE549e5BaA8e91D2d825A2DA9ec3AE";
 
 export function useTicketingSystem() {
@@ -56,13 +55,14 @@ export function useTicketingSystem() {
 		pricePerTicket,
 		platformFeePercentage,
 		transferFeePercentage,
-		transferCooldown,
-		startTime,
-		endTime,
+		startDate,
+		expirationDate,
 		imageUrl,
 		city,
 		country,
 		ticketsAvailable,
+		storeId,
+		secretName,
 		category,
 		eventType,
 	}: {
@@ -71,13 +71,14 @@ export function useTicketingSystem() {
 		pricePerTicket: string;
 		platformFeePercentage: number;
 		transferFeePercentage: number;
-		transferCooldown: number;
-		startTime: number;
-		endTime: number;
+		startDate: number;
+		expirationDate: number;
 		imageUrl: string;
 		city: string;
 		country: string;
 		ticketsAvailable: number;
+		storeId: string;
+		secretName: string;
 		category: string;
 		eventType: string;
 	}) => {
@@ -89,15 +90,16 @@ export function useTicketingSystem() {
 				name,
 				description,
 				parseEther(pricePerTicket),
-				(platformFeePercentage),
-				(transferFeePercentage),
-				(transferCooldown),
-				(startTime),
-				(endTime),
+				platformFeePercentage,
+				transferFeePercentage,
+				startDate,
+				expirationDate,
 				imageUrl,
 				city,
 				country,
-				(ticketsAvailable),
+				ticketsAvailable,
+				storeId,
+				secretName,
 				category,
 				eventType,
 			],
@@ -105,28 +107,48 @@ export function useTicketingSystem() {
 	};
 
 	// Buy Ticket
-	const buyTicket = async (campaignId: string, price: string) => {
+	const buyTicket = async (
+		campaignId: string,
+		price: string,
+		imageUrl: string,
+	) => {
 		return writeContract({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
 			functionName: "buyTicket",
 			value: parseEther(price),
-			args: [BigInt(campaignId)],
+			args: [BigInt(campaignId), imageUrl],
 		});
 	};
 
-	// Transfer Ticket
-	const transferTicket = async (
-		ticketId: bigint,
-		to: `0x${string}`,
-		amount: string,
-	) => {
+	// Create Transfer
+	const createTransfer = async (tokenId: bigint, amount: string) => {
 		return writeContract({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
-			functionName: "transferTicket",
+			functionName: "createTransfer",
+			args: [tokenId, parseEther(amount)],
+		});
+	};
+
+	// Complete Transfer
+	const completeTransfer = async (transferId: bigint, amount: string) => {
+		return writeContract({
+			address: TICKETING_SYSTEM_ADDRESS,
+			abi: ticketingSystemABI,
+			functionName: "completeTransfer",
 			value: parseEther(amount),
-			args: [ticketId, to],
+			args: [transferId],
+		});
+	};
+
+	// Cancel Transfer
+	const cancelTransfer = async (transferId: bigint) => {
+		return writeContract({
+			address: TICKETING_SYSTEM_ADDRESS,
+			abi: ticketingSystemABI,
+			functionName: "cancelTransfer",
+			args: [transferId],
 		});
 	};
 
@@ -141,12 +163,12 @@ export function useTicketingSystem() {
 	};
 
 	// Get Ticket
-	const useTicket = (ticketId: number) => {
+	const useTicket = (tokenId: number) => {
 		return useReadContract({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
 			functionName: "getTicket",
-			args: [BigInt(ticketId)],
+			args: [BigInt(tokenId)],
 		});
 	};
 
@@ -160,24 +182,41 @@ export function useTicketingSystem() {
 		});
 	};
 
-	// Redeem Ticket
-	const redeemTicket = async (ticketId: bigint) => {
-		return writeContract({
+	// Get Campaigns by Country
+	const useCampaignsByCountry = (
+		country: string,
+		page: number,
+		pageSize: number,
+	) => {
+		return useReadContract({
 			address: TICKETING_SYSTEM_ADDRESS,
 			abi: ticketingSystemABI,
-			functionName: "redeemTicket",
-			args: [ticketId],
+			functionName: "getCampaignsByCountry",
+			args: [country, BigInt(page), BigInt(pageSize)],
+		});
+	};
+
+	// Get Campaigns by City
+	const useCampaignsByCity = (city: string, page: number, pageSize: number) => {
+		return useReadContract({
+			address: TICKETING_SYSTEM_ADDRESS,
+			abi: ticketingSystemABI,
+			functionName: "getCampaignsByCity",
+			args: [city, BigInt(page), BigInt(pageSize)],
 		});
 	};
 
 	return {
 		createCampaign,
 		buyTicket,
-		transferTicket,
+		createTransfer,
+		completeTransfer,
+		cancelTransfer,
 		useCampaign,
 		useTicket,
 		useCampaignsByPage,
-		redeemTicket,
+		useCampaignsByCountry,
+		useCampaignsByCity,
 		isConfirmed,
 		isConfirming,
 	};

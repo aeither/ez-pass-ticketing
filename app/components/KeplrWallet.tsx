@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useNillionAuth, UserCredentials } from "@nillion/client-react-hooks";
-import { config } from "../config/Chain";
+import type { Window as KeplrWindow } from "@keplr-wallet/types";
+import { type UserCredentials, useNillionAuth } from "@nillion/client-react-hooks";
 import Image from "next/image";
-import { Window as KeplrWindow } from "@keplr-wallet/types";
+import { useState } from "react";
+import { config } from "../config/Chain";
 
 declare global {
   interface Window extends KeplrWindow {}
@@ -63,30 +63,30 @@ const KeplrWalletConnector = () => {
   const handleLogin = async () => {
     try {
       setIsLoading(true);
-      await checkKeplr();
+      // await checkKeplr();
       
-      const chainId = "nillion-chain-testnet-1";
-      await addDevnetChain();
+      // const chainId = "nillion-chain-testnet-1";
+      // await addDevnetChain();
       
-      const keplr = window.keplr;
-      if (!keplr) {
-        throw new Error("Keplr not found");
-      }
+      // const keplr = window.keplr;
+      // if (!keplr) {
+      //   throw new Error("Keplr not found");
+      // }
       
-      const offlineSigner = keplr.getOfflineSigner(chainId);
-      const accounts = await offlineSigner.getAccounts();
+      // const offlineSigner = keplr.getOfflineSigner(chainId);
+      // const accounts = await offlineSigner.getAccounts();
       
-      if (!accounts || accounts.length === 0) {
-        throw new Error("No accounts found");
-      }
+      // if (!accounts || accounts.length === 0) {
+      //   throw new Error("No accounts found");
+      // }
   
-      const address = accounts[0].address;
-      setWalletAddress(address);  
+      // const address = accounts[0].address;
+      // setWalletAddress(address);  
       const credentials: UserCredentials = {
         userSeed: SEED,
       };
       await login(credentials);
-      console.log("Successfully logged in with address:", address);
+      // console.log("Successfully logged in with address:", address);
     } catch (err: unknown) {
       console.error("Login error:", err);
       if (err instanceof Error) {
