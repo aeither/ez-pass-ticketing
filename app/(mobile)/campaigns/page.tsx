@@ -1,5 +1,6 @@
 "use client";
 
+import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -98,84 +99,87 @@ export default function CampaignsPage() {
 	}
 
 	return (
-		<div className="container mx-auto px-4 py-8">
-			<Card className="bg-background">
-				<CardHeader>
-					<CardTitle className="text-2xl font-bold text-center sm:text-left">
-						Available Events
-					</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-						{campaigns?.map((campaign: any) => (
-							<Card
-								key={campaign.campaignId.toString()}
-								className="flex flex-col justify-between"
-							>
-								<CardHeader>
-									<CardTitle className="text-xl">{campaign.name}</CardTitle>
-								</CardHeader>
-								<CardContent>
-									<p className="text-muted-foreground mb-4">
-										{campaign.description}
-									</p>
-									<div className="space-y-2 text-sm">
-										<p className="flex justify-between">
-											<span>Price:</span>
-											<span className="font-medium">
-												{formatEther(campaign.pricePerTicket)} ETH
-											</span>
+		<div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900">
+			<Header />
+			<div className="container mx-auto px-4 py-8">
+				<Card className="bg-background">
+					<CardHeader>
+						<CardTitle className="text-2xl font-bold text-center sm:text-left">
+							Available Events
+						</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+							{campaigns?.map((campaign: any) => (
+								<Card
+									key={campaign.campaignId.toString()}
+									className="flex flex-col justify-between"
+								>
+									<CardHeader>
+										<CardTitle className="text-xl">{campaign.name}</CardTitle>
+									</CardHeader>
+									<CardContent>
+										<p className="text-muted-foreground mb-4">
+											{campaign.description}
 										</p>
-										<p className="flex justify-between">
-											<span>Available Tickets:</span>
-											<span className="font-medium">
-												{campaign.ticketsAvailable.toString()}
-											</span>
-										</p>
-									</div>
-								</CardContent>
-								<CardFooter className="flex flex-col space-y-2 sm:flex-row sm:justify-between sm:space-y-0 sm:space-x-2">
-									<Button
-										onClick={() =>
-											setSelectedCampaign(Number(campaign.campaignId))
-										}
-										variant="outline"
-										className="w-full sm:w-auto"
-									>
-										View Details
-									</Button>
-									<Button
-										onClick={() =>
-											handleBuyTicket(campaign.campaignId.toString())
-										}
-										className="w-full sm:w-auto"
-										disabled={isConfirming}
-									>
-										<Ticket className="mr-2 h-4 w-4" />
-										{isConfirming ? "Confirming..." : "Buy Ticket"}
-									</Button>
-								</CardFooter>
-							</Card>
-						))}
-					</div>
-				</CardContent>
-				<CardFooter className="flex justify-between mt-6">
-					<Button
-						onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-						disabled={currentPage === 0}
-						variant="outline"
-					>
-						<ArrowLeft className="mr-2 h-4 w-4" /> Previous
-					</Button>
-					<Button
-						onClick={() => setCurrentPage((p) => p + 1)}
-						disabled={!campaigns || campaigns.length < pageSize}
-						variant="outline"
-					>
-						Next <ArrowRight className="ml-2 h-4 w-4" />
-					</Button>
-				</CardFooter>
-			</Card>
+										<div className="space-y-2 text-sm">
+											<p className="flex justify-between">
+												<span>Price:</span>
+												<span className="font-medium">
+													{formatEther(campaign.pricePerTicket)} ETH
+												</span>
+											</p>
+											<p className="flex justify-between">
+												<span>Available Tickets:</span>
+												<span className="font-medium">
+													{campaign.ticketsAvailable.toString()}
+												</span>
+											</p>
+										</div>
+									</CardContent>
+									<CardFooter className="flex flex-col space-y-2 sm:flex-row sm:justify-between sm:space-y-0 sm:space-x-2">
+										<Button
+											onClick={() =>
+												setSelectedCampaign(Number(campaign.campaignId))
+											}
+											variant="outline"
+											className="w-full sm:w-auto"
+										>
+											View Details
+										</Button>
+										<Button
+											onClick={() =>
+												handleBuyTicket(campaign.campaignId.toString())
+											}
+											className="w-full sm:w-auto"
+											disabled={isConfirming}
+										>
+											<Ticket className="mr-2 h-4 w-4" />
+											{isConfirming ? "Confirming..." : "Buy Ticket"}
+										</Button>
+									</CardFooter>
+								</Card>
+							))}
+						</div>
+					</CardContent>
+					<CardFooter className="flex justify-between mt-6">
+						<Button
+							onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+							disabled={currentPage === 0}
+							variant="outline"
+						>
+							<ArrowLeft className="mr-2 h-4 w-4" /> Previous
+						</Button>
+						<Button
+							onClick={() => setCurrentPage((p) => p + 1)}
+							disabled={!campaigns || campaigns.length < pageSize}
+							variant="outline"
+						>
+							Next <ArrowRight className="ml-2 h-4 w-4" />
+						</Button>
+					</CardFooter>
+				</Card>
+			</div>
 		</div>
 	);
 }

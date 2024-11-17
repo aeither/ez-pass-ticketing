@@ -1,13 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-	List,
-	Megaphone,
-	PlusCircle,
-	Send,
-	Wallet
-} from "lucide-react";
+import { MiniKit } from "@worldcoin/minikit-js";
+import { List, Megaphone, PlusCircle, Send, Wallet } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Header } from "./components/Header";
 
 interface FeatureCardProps {
@@ -29,6 +25,15 @@ interface TicketItemProps {
 }
 
 export default function LandingPage() {
+	const [isWorldApp, setIsWorldApp] = useState(false);
+
+	useEffect(() => {
+		if (MiniKit.isInstalled()) {
+			setIsWorldApp(true);
+			return;
+		}
+	}, []);
+
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900">
 			<Header />
@@ -43,11 +48,12 @@ export default function LandingPage() {
 					</p>
 				</section>
 
-				<section
-					id="features"
-					className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
-				>
-					{/* <Link href="/world/interact">
+				{isWorldApp ? (
+					<section
+						id="features"
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+					>
+						{/* <Link href="/world/interact">
 						<FeatureCard
 							icon={<Send className="h-8 w-8 text-purple-600" />}
 							title="Interact"
@@ -61,47 +67,76 @@ export default function LandingPage() {
 							description="Interact 2."
 						/>
 					</Link> */}
-					{/* <Link href="/world/verify">
+						{/* <Link href="/world/verify">
 						<FeatureCard
 							icon={<Globe className="h-8 w-8 text-purple-600" />}
 							title="World ID Verification"
 							description="Buy tickets securely with World ID verification, ensuring authenticity and preventing fraud."
 						/>
 					</Link> */}
-					<Link href="/world/create-campaign">
-						<FeatureCard
-							icon={<PlusCircle className="h-8 w-8 text-purple-600" />}
-							title="Create Campaigns"
-							description="Launch your own event campaigns and sell tickets directly through the app."
-						/>
-					</Link>
-					<Link href="/world/pay">
-						<FeatureCard
-							icon={<Send className="h-8 w-8 text-purple-600" />}
-							title="Send Money to Friends"
-							description="Split costs and send money to friends seamlessly within the app."
-						/>
-					</Link>
-					<Link href="/world/campaigns">
-						<FeatureCard
-							icon={<Megaphone className="h-8 w-8 text-purple-600" />}
-							title="Discover Campaigns"
-							description="Explore exciting event campaigns and be the first to know about upcoming experiences."
-						/>
-					</Link>
-					{/* <FeatureCard
+						<Link href="/world/create-campaign">
+							<FeatureCard
+								icon={<PlusCircle className="h-8 w-8 text-purple-600" />}
+								title="Create Campaigns"
+								description="Launch your own event campaigns and sell tickets directly through the app."
+							/>
+						</Link>
+						<Link href="/world/pay">
+							<FeatureCard
+								icon={<Send className="h-8 w-8 text-purple-600" />}
+								title="Send Money to Friends"
+								description="Split costs and send money to friends seamlessly within the app."
+							/>
+						</Link>
+						<Link href="/world/campaigns">
+							<FeatureCard
+								icon={<Megaphone className="h-8 w-8 text-purple-600" />}
+								title="Discover Campaigns"
+								description="Explore exciting event campaigns and be the first to know about upcoming experiences."
+							/>
+						</Link>
+						{/* <FeatureCard
 						icon={<Ticket className="h-8 w-8 text-purple-600" />}
 						title="Buy Tickets"
 						description="Purchase tickets quickly and securely for your favorite events."
 					/> */}
-					<Link href="/world/tickets">
-						<FeatureCard
-							icon={<Wallet className="h-8 w-8 text-purple-600" />}
-							title="Manage Your Tickets"
-							description="Access and manage all your tickets in one convenient place."
-						/>
-					</Link>
-				</section>
+						<Link href="/world/tickets">
+							<FeatureCard
+								icon={<Wallet className="h-8 w-8 text-purple-600" />}
+								title="Manage Your Tickets"
+								description="Access and manage all your tickets in one convenient place."
+							/>
+						</Link>
+					</section>
+				) : (
+					<section
+						id="features"
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+					>
+						<Link href="/create-campaign">
+							<FeatureCard
+								icon={<PlusCircle className="h-8 w-8 text-purple-600" />}
+								title="Create Campaigns"
+								description="Launch your own event campaigns and sell tickets directly through the app."
+							/>
+						</Link>
+						
+						<Link href="/world/campaigns">
+							<FeatureCard
+								icon={<Megaphone className="h-8 w-8 text-purple-600" />}
+								title="Discover Campaigns"
+								description="Explore exciting event campaigns and be the first to know about upcoming experiences."
+							/>
+						</Link>
+						<Link href="/world/tickets">
+							<FeatureCard
+								icon={<Wallet className="h-8 w-8 text-purple-600" />}
+								title="Manage Your Tickets"
+								description="Access and manage all your tickets in one convenient place."
+							/>
+						</Link>
+					</section>
+				)}
 
 				<section id="campaigns" className="mb-16">
 					<h2 className="text-3xl font-bold mb-8 text-center">
