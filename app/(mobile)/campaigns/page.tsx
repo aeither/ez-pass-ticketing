@@ -2,15 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+	Card,
+	CardContent,
+	CardFooter,
+	CardHeader,
+	CardTitle,
 } from "@/components/ui/card";
+import { useTicketingSystem } from "@/lib/useTicketingSystem";
 import { ArrowLeft, ArrowRight, Ticket } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { formatEther } from "viem";
+import { useAccount } from "wagmi";
 
 interface Campaign {
 	campaignId: string;
@@ -20,66 +23,63 @@ interface Campaign {
 	ticketsAvailable: string;
 }
 
-const mockCampaigns: Campaign[] = [
-	{
-		campaignId: "1",
-		name: "Web3 Conference 2024",
-		description:
-			"Join the biggest Web3 conference in Asia featuring top speakers and networking opportunities",
-		pricePerTicket: "50000000000000000", // 0.05 ETH
-		ticketsAvailable: "100",
-	},
-	{
-		campaignId: "2",
-		name: "NFT Art Exhibition",
-		description:
-			"Exclusive digital art showcase featuring renowned NFT artists and collectors",
-		pricePerTicket: "100000000000000000", // 0.1 ETH
-		ticketsAvailable: "50",
-	},
-	{
-		campaignId: "3",
-		name: "DeFi Summit",
-		description:
-			"Deep dive into the latest DeFi protocols and yield farming strategies",
-		pricePerTicket: "75000000000000000", // 0.075 ETH
-		ticketsAvailable: "75",
-	},
-];
-
 export default function CampaignsPage() {
-	const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-	const [currentPage, setCurrentPage] = useState(0);
-	const [selectedCampaign, setSelectedCampaign] = useState<number | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
-	const pageSize = 6;
+	const { address } = useAccount();
+	const {
+		buyTicket,
+		useCampaign,
+		useCampaignsByPage,
+		getUserTickets,
+		isConfirming,
+	} = useTicketingSystem();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	const [currentPage, setCurrentPage] = useState(0);
+	const pageSize = 6;
+	const { data: campaigns, isLoading } = useCampaignsByPage(
+		currentPage,
+		pageSize,
+	);
+	const [selectedCampaign, setSelectedCampaign] = useState<number | null>(null);
+	const { data: campaign } = useCampaign(selectedCampaign || 0);
+	const [userTickets, setUserTickets] = useState<any[]>([]);
+
 	useEffect(() => {
-		const fetchCampaigns = async () => {
+		const fetchUserTickets = async () => {
+			if (!address) return;
 			try {
-				// Simulate API call delay
-				await new Promise((resolve) => setTimeout(resolve, 1000));
-				setCampaigns(mockCampaigns);
-			} catch (error) {
-				toast.error("Failed to fetch campaigns", {
-					description: "Please try again later",
-				});
-			} finally {
-				setIsLoading(false);
+				const tickets = await getUserTickets(address);
+				setUserTickets(tickets as any);
+			} catch (error: any) {
+				toast.error("Failed to fetch user tickets");
 			}
 		};
 
-		fetchCampaigns();
-	}, [toast]);
+		fetchUserTickets();
+	}, [address, getUserTickets]);
 
 	const handleBuyTicket = async (campaignId: string) => {
+		if (!campaign?.pricePerTicket) {
+			toast.error("Invalid ticket price");
+			return;
+		}
+
 		try {
-			// Simulate transaction
-			await new Promise((resolve) => setTimeout(resolve, 1500));
-			toast.success(`Successfully purchased ticket for campaign ${campaignId}`);
-		} catch (error) {
-			toast.error("Failed to purchase ticket");
+			const tx = await buyTicket(
+				BigInt(campaignId),
+				campaign.pricePerTicket.toString(),
+				"ticket-image.jpg", // You might want to handle image upload
+			);
+
+			if (tx) {
+				toast.success("Ticket purchased successfully");
+				// Refresh user tickets after purchase
+				if (address) {
+					const tickets = await getUserTickets(address);
+					setUserTickets(tickets as any);
+				}
+			}
+		} catch (error: any) {
+			toast.error(error.message || "Failed to purchase ticket");
 		}
 	};
 
@@ -107,9 +107,9 @@ export default function CampaignsPage() {
 				</CardHeader>
 				<CardContent>
 					<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-						{campaigns.map((campaign) => (
+						{campaigns?.map((campaign: any) => (
 							<Card
-								key={campaign.campaignId}
+								key={campaign.campaignId.toString()}
 								className="flex flex-col justify-between"
 							>
 								<CardHeader>
@@ -123,13 +123,13 @@ export default function CampaignsPage() {
 										<p className="flex justify-between">
 											<span>Price:</span>
 											<span className="font-medium">
-												{Number(campaign.pricePerTicket) / 1e18} ETH
+												{formatEther(campaign.pricePerTicket)} ETH
 											</span>
 										</p>
 										<p className="flex justify-between">
 											<span>Available Tickets:</span>
 											<span className="font-medium">
-												{Number(campaign.ticketsAvailable)}
+												{campaign.ticketsAvailable.toString()}
 											</span>
 										</p>
 									</div>
@@ -145,10 +145,14 @@ export default function CampaignsPage() {
 										View Details
 									</Button>
 									<Button
-										onClick={() => handleBuyTicket(campaign.campaignId)}
+										onClick={() =>
+											handleBuyTicket(campaign.campaignId.toString())
+										}
 										className="w-full sm:w-auto"
+										disabled={isConfirming}
 									>
-										<Ticket className="mr-2 h-4 w-4" /> Buy Ticket
+										<Ticket className="mr-2 h-4 w-4" />
+										{isConfirming ? "Confirming..." : "Buy Ticket"}
 									</Button>
 								</CardFooter>
 							</Card>
