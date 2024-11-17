@@ -156,7 +156,7 @@ export default function LandingPage() {
 				<div className="container mx-auto px-4 py-8">
 					<div className="flex flex-col sm:flex-row justify-between items-center">
 						<p className="text-sm text-gray-600 dark:text-gray-400 mb-4 sm:mb-0">
-							© 2024 Safe Ticket. All rights reserved.
+							© 2024 EZ-Pass. All rights reserved.
 						</p>
 						<div className="flex space-x-4">
 							<Link

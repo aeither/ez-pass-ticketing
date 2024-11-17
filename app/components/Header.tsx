@@ -8,7 +8,7 @@ export function Header() {
 					href="/"
 					className="text-2xl font-bold text-purple-600 dark:text-purple-400"
 				>
-					Safe Ticket
+					EZ Pass
 				</Link>
 				<nav className="hidden sm:flex space-x-4">
 					<Link
