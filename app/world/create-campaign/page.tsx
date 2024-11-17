@@ -17,10 +17,15 @@ import {
 	VerificationLevel,
 	type VerifyCommandInput,
 } from "@worldcoin/minikit-js";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parseEther } from "viem"; // You can still use viem for parsing
 
+interface GenerationResponse {
+	base64Image: string;
+	ipfsUrl: string;
+}
 const COUNTER_ADDRESS = "0xA2DD26D1e1b87975692ab9efdD84177BC16fcA98"; // mainnnet
 
 const BASE_EXPLORER_URL = "https://worldscan.org";
@@ -28,11 +33,46 @@ const BASE_EXPLORER_URL = "https://worldscan.org";
 export default function CreateCampaignPage() {
 	const [isVerifying, setIsVerifying] = useState(false);
 	const [isVerified, setIsVerified] = useState(false);
+	const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+	const [generatedImage, setGeneratedImage] =
+		useState<GenerationResponse | null>(null);
 
 	const verifyPayload: VerifyCommandInput = {
 		action: "buyer-unique",
 		signal: "0x12312",
 		verification_level: VerificationLevel.Orb,
+	};
+
+	const generateImage = async (prompt: string) => {
+		try {
+			setIsGeneratingImage(true);
+			const response = await fetch("/api/hyperbolic", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					prompt,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to generate image");
+			}
+
+			const result = await response.json();
+			setGeneratedImage(result);
+			setFormData((prev) => ({
+				...prev,
+				imageUrl: result.ipfsUrl,
+			}));
+			toast.success("Image generated successfully!");
+		} catch (error) {
+			toast.error("Failed to generate image");
+			console.error(error);
+		} finally {
+			setIsGeneratingImage(false);
+		}
 	};
 
 	const handleVerify = async () => {
@@ -181,7 +221,7 @@ export default function CreateCampaignPage() {
 					],
 				});
 			console.log("Transaction sent:", finalPayload);
-			window.location.href = '/';
+			window.location.href = "/";
 		} catch (error) {
 			console.error("Error:", error);
 			alert("Transaction failed");
@@ -276,6 +316,45 @@ export default function CreateCampaignPage() {
 							onChange={handleInputChange}
 							className="w-full px-4 py-2 border rounded"
 						/>
+						<div className="space-y-4">
+							<div className="flex gap-2">
+								<input
+									type="text"
+									name="imageUrl"
+									placeholder="Enter prompt for image generation..."
+									value={formData.imageUrl}
+									onChange={handleInputChange}
+									className="w-full px-4 py-2 border rounded"
+								/>
+								<Button
+									onClick={() => generateImage(formData.imageUrl)}
+									disabled={isGeneratingImage || !formData.imageUrl}
+								>
+									{isGeneratingImage && (
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									)}
+									Generate
+								</Button>
+							</div>
+
+							{generatedImage && (
+								<Card className="p-4">
+									<div className="aspect-square relative">
+										<img
+											src={`data:image/png;base64,${generatedImage.base64Image}`}
+											// biome-ignore lint/a11y/noRedundantAlt: <explanation>
+											alt="Generated event image"
+											className="rounded-lg object-cover w-full h-full"
+										/>
+									</div>
+									<div className="mt-2">
+										<p className="text-sm text-gray-500 break-all">
+											IPFS URL: {generatedImage.ipfsUrl}
+										</p>
+									</div>
+								</Card>
+							)}
+						</div>
 						<input
 							type="text"
 							name="pricePerTicket"

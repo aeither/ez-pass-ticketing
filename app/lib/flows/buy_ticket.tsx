@@ -1,5 +1,4 @@
 // import { ethers, Contract } from 'ethers';
-// import { TicketAPI } from './ticketApi';
 // import Hyperbolic from '@/api/upload/hyperbolic-with-image-upload';
 
 // async function buyTicket(campaignId: number) {
