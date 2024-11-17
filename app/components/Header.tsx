@@ -1,6 +1,20 @@
+"use client";
+
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { MiniKit } from "@worldcoin/minikit-js";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export function Header() {
+	const [isWorldApp, setIsWorldApp] = useState(false);
+
+	useEffect(() => {
+		if (MiniKit.isInstalled()) {
+			setIsWorldApp(true);
+			return;
+		}
+	}, []);
+
 	return (
 		<header className="sticky top-0 z-50 backdrop-blur-lg bg-white/75 dark:bg-gray-900/75 border-b border-gray-200 dark:border-gray-800">
 			<div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -30,7 +44,7 @@ export function Header() {
 						My Tickets
 					</Link>
 				</nav>
-				{/* <Button variant="outline">Sign In</Button> */}
+				{!isWorldApp && <ConnectButton />}
 			</div>
 		</header>
 	);
